@@ -1,0 +1,35 @@
+services:
+  simple-db:
+    image: simple-db
+    build:
+      context: ./db
+    env_file:
+      - .env
+    networks:
+      - simple-network
+  simple-api:
+    image: simple-api
+    build:
+      context: ./graphql
+    env_file:
+      - .env
+    depends_on:
+      - simple-db
+    command:
+      [
+        "--connection",
+        "${DATABASE_URL}",
+        "--port",
+        "8008",
+        "--schema",
+        "public",
+        "--append-plugins",
+        "postgraphile-plugin-connection-filter",
+      ]
+    networks:
+      - simple-network
+    ports:
+      - 8008:8008
+
+networks:
+  simple-network:
